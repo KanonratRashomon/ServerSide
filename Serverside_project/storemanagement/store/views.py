@@ -1,3 +1,12 @@
 from django.shortcuts import render
+from datetime import datetime, timedelta
+from django.shortcuts import render, redirect
+from django.views import View
+from django.utils import timezone
+from django.db.models import Q
+from store.models import *
 
-# Create your views here.
+class HomepageView(View):
+    def get(self, request):
+        return render(request, "homepage.html")
+
