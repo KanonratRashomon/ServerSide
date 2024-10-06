@@ -87,7 +87,7 @@ DATABASES = {
 }
 
 
-# Password validation, Don't forget to change it if you want to access to database
+# Password validation, Don't forget to change it if you want to access to database password is 2512 and 4286
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
