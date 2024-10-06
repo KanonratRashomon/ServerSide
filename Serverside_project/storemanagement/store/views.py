@@ -8,5 +8,9 @@ from store.models import *
 
 class HomepageView(View):
     def get(self, request):
-        return render(request, "homepage.html")
+        products = Products.objects.all()
+
+        return render(request, "homepage.html", {
+            "products": products
+        })
 

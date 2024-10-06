@@ -1,7 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+body {
+    font-family: 'Noto Sans Thai', sans-serif;
+}
 
 .hero-section{
     background-image: url('https://images.pexels.com/photos/1637438/pexels-photo-1637438.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
-    block-size: cover;
+    background-size: cover;
     background-position: center;
     color: white;
     padding: 100px 0;

@@ -80,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'game_store_db',
         'USER': 'postgres',
-        'PASSWORD': '2512',
+        'PASSWORD': '4286',
         'HOST': 'localhost',
         'PORT': '5432',
     }
