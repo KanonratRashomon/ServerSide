@@ -19,6 +19,28 @@
     {% include 'nav.html' %}
 
     <div class='container my-5'>
+        <div class='row'>
+            {% comment %} รูปภาพ {% endcomment %}
+            <div class='col-md-6'>
+                <div class='col-3'>
+                </div>
+            </div>
+            
+            <div class='col-md-6'>
+                <h1 class='mb-3'>{{product_details.title}}</h1>
+                <p class='price mb-2'>ราคา: ${{product_details.price}}</p>
+                <button class="btn btn-primary btn-lg add-to-cart-btn w-100 mb-3">เพิ่มลงตะกร้า</button>
+                <div class='card mb-3'>
+                    <div class='card-body'>
+                        <h5 class='card-title'>รายละเอียดสินค้า</h5>
+                        <p class='card-text'>{{product_details.description}}</p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    {% comment %} <div class='container my-5'>
         <h1 class='mb-4'>{{product_details.title}}</h1>
         <div class='row'>
         <div class='col-lg-4 col-md-6'>
@@ -29,7 +51,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
