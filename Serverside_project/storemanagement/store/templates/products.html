@@ -14,31 +14,73 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
 
+    <style>
+        .filter-input {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 
 <body>
     {% include 'nav.html' %}
     <div class='container my-5'>
         <h1 class='mb-4'>สินค้าทั้งหมด</h1>
-        <div class='row'>
-            {% for product in products %}
-            <div class='col-lg-4 col-md-6'>
-                <a href="{% url 'product_details' product.id %}" class='card-link'>
-                    <div class='card'>
-                        <img src='' class='card-img-top'>
-                        <div class='card-body'>
-                            <h5 class="card-title">{{ product.title }}</h5>
-                            <p class="card-text">ราคา: ${{ product.price }}</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
+
+        <!-- Product Type Filter -->
+        <form method="GET" action="">
+            <select name="product_type" class="form-select filter-input" onchange="this.form.submit()">
+                <option value="">เลือกประเภทสินค้า</option>
+                {% for product_type in product_types %}
+                    <option value="{{ product_type }}" {% if product_type == selected_product_type %}selected{% endif %}>
+                        {{ product_type }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+
+        <input type="text" id="productFilter" class="form-control filter-input" placeholder="ค้นหาสินค้า...">
+
+        <table class='table table-striped' id="productTable">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">ชื่อสินค้า</th>
+                    <th scope="col">ราคา</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>
+                        <a href="{% url 'product_details' product.id %}" class="body-link">{{ product.title }}</a>
+                    </td>
+                    <td>${{ product.price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        // JavaScript function to filter products by name
+        document.getElementById('productFilter').addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#productTable tbody tr');
+
+            rows.forEach(row => {
+                const title = row.querySelector('td a').textContent.toLowerCase();
+                if (title.includes(filter)) {
+                    row.style.display = ''; // Show row
+                } else {
+                    row.style.display = 'none'; // Hide row
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

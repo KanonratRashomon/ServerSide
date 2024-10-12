@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+    {% include 'nav.html' %}
+    <div class="container my-5">
+        <h1 class="mb-4">โปรไฟล์ของคุณ</h1>
+
+        <div class="row">
+            <div class="col-md-4">
+                {% if user_profile.profile_picture %}
+                    <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid mb-3">
+                {% else %}
+                    <img src="{% static 'default_profile_picture.png' %}" alt="Default Profile Picture" class="img-fluid mb-3">
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                <h3>{{ user.username }}</h3>
+                <p><strong>Email:</strong> {{ user_profile.bio }}</p>
+                <p><strong>Address:</strong> {{ user_profile.phone_number }}</p>
+            </div>
+        </div>
+
+        <h2 class="mt-4">แก้ไขโปรไฟล์</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">บันทึก</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>
