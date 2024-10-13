@@ -31,7 +31,7 @@
         <h1 class='mb-4' style="font-weight: bold;">สินค้าแนะนำ</h1>
         <div class='row'>
             {% for product in products %}
-            <div class='col-lg-4 col-md-6'>
+            <div class='col-lg-4 mt-3 col-md-6'>
                 <a href="{% url 'product_details' product.id %}" class='card-link'>
                     <div class='card'>
                         <img src='' class='card-img-top'>

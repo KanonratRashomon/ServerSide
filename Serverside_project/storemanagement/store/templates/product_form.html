@@ -1,0 +1,68 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+</head>
+
+<body>
+    {% include 'nav.html' %}
+    <div class="container my-5">
+        <h1>{{ form.instance.pk|yesno:"Edit Product,Create Product" }}</h1>
+
+        <form method="POST" enctype="multipart/form-data" class="mt-4">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="mb-3">
+                <label for="title" class="form-label">ชื่อสินค้า</label>
+                {{ form.title }}
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">รายละเอียดสินค้า</label>
+                {{ form.description }}
+            </div>
+
+            <div class="mb-3">
+                <label for="product_type" class="form-label">ประเภทสินค้า</label>
+                {{ form.product_type }}
+            </div>
+
+            <div class="mb-3">
+                <label for="price" class="form-label">ราคา</label>
+                {{ form.price }}
+            </div>
+
+            <div class="mb-3">
+                <label for="stock_quantity" class="form-label">จำนวนในคลัง</label>
+                {{ form.stock_quantity }}
+            </div>
+
+            <div class="mb-3">
+                <label for="release_date" class="form-label">วันที่วางจำหน่าย</label>
+                {{ form.release_date }}
+            </div>
+
+            <div class="mb-3">
+                <label for="added_by_employee" class="form-label">เพิ่มโดยพนักงาน</label>
+                {{ form.added_by_employee }}
+            </div>
+
+            <button type="submit" class="btn btn-primary">บันทึกสินค้า</button>
+            <a href="{% url 'products' %}" class="btn btn-secondary">ยกเลิก</a>
+        </form>
+    </div>
+</body>
+
+</html>

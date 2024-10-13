@@ -5,13 +5,14 @@ from django.views import View
 from django.utils import timezone
 from django.db.models import Q
 from store.models import *
+from .forms import ProductForm
 
 class HomepageView(View):
     def get(self, request):
         products = Products.objects.all()
 
-        return render(request, "homepage.html", {
-            "products": products
+        return render(request, 'homepage.html', {
+            'products': products
         })
     
 class ProductListView(View):
@@ -39,9 +40,41 @@ class ProductDetailView(View):
     def get(self, request, product_id):
         product_details = Products.objects.get(pk=product_id)
 
-        return render(request, "product_detail.html", {
-            "product_details": product_details
-        })
+        return render(request, 'product_detail.html', {'product_details': product_details})
+
+class AddProductView(View):
+    def get(self, request):
+        form = ProductForm()
+        return render(request, 'product_form.html', {'form': form})
+
+    def post(self, request):
+        form = ProductForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect('products')
+
+class DelProduct(View):
+    def get(self, request, product_id):
+        product = Products.objects.get(pk=product_id)
+        product.delete()
+        return redirect('products')
+
+class UpdateProduct(View):
+    def get(self, request, product_id):
+        product = Products.objects.get(pk=product_id)
+        form = ProductForm(instance=product)
+        return render(request, 'product_form.html', {'form': form})
+
+    def post(self, request, product_id):
+        product = Products.objects.get(pk=product_id)
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('products')
+
+        return render(request, 'product_form.html', {'form': form})
+
 
 class ProfileView(View):
     def get(self, request):

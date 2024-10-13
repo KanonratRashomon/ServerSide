@@ -33,12 +33,13 @@
                     <select name="product_type" class="form-select filter-input" onchange="this.form.submit()">
                         <option value="">เลือกประเภทสินค้า</option>
                         {% for product_type in product_types %}
-                            <option value="{{ product_type }}" {% if product_type == selected_product_type %}selected{% endif %}>
-                                {{ product_type }}
-                            </option>
+                        <option value="{{ product_type }}" {% if product_type == selected_product_type %}selected{% endif %}>
+                            {{ product_type }}
+                        </option>
                         {% endfor %}
                     </select>
                     <input type="text" id="productFilter" class="form-control filter-input" placeholder="ค้นหาสินค้า...">
+                    <a class="btn btn-sm btn-primary" href="{% url 'new_product' %}">เพิ่มสินค้า</a>
                 </div>
             </form>
         </div>
@@ -61,8 +62,8 @@
                     </td>
                     <td>${{ product.price }}</td>
                     <td>
-                        <a class="btn btn-sm btn-warning">แก้ไข</a>
-                        <a class="btn btn-sm btn-danger">ลบ</a>
+                        <a class="btn btn-sm btn-warning" href="{% url 'update_product' product.id %}">แก้ไข</a>
+                        <a class="btn btn-sm btn-danger" href="{% url 'remove_product' product.id %}">ลบ</a>
                     </td>
                 </tr>
                 {% endfor %}
