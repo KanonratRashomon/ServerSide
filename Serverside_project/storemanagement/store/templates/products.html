@@ -27,23 +27,27 @@
         <h1 class='mb-4'>สินค้าทั้งหมด</h1>
 
         <!-- Product Type Filter -->
-        <form method="GET" action="">
-            <select name="product_type" class="form-select filter-input" onchange="this.form.submit()">
-                <option value="">เลือกประเภทสินค้า</option>
-                {% for product_type in product_types %}
-                    <option value="{{ product_type }}" {% if product_type == selected_product_type %}selected{% endif %}>
-                        {{ product_type }}
-                    </option>
-                {% endfor %}
-            </select>
-        </form>
+         <div class='col-lg-12'>
+            <form method="GET" action="" class='mb-4'>
+                <div class='d-flex'>
+                <select name="product_type" class="form-select filter-input" onchange="this.form.submit()">
+                    <option value="">เลือกประเภทสินค้า</option>
+                    {% for product_type in product_types %}
+                        <option value="{{ product_type }}" {% if product_type == selected_product_type %}selected{% endif %}>
+                            {{ product_type }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <input type="text" id="productFilter" class="form-control filter-input" placeholder="ค้นหาสินค้า...">
+            </div>
+            </form>
+        </div>
+        
 
-        <input type="text" id="productFilter" class="form-control filter-input" placeholder="ค้นหาสินค้า...">
-
-        <table class='table table-striped' id="productTable">
+        <table class='table table-borderless' id="productTable">
             <thead>
-                <tr>
-                    <th scope="col">#</th>
+                <tr >
+                    <th scope="col">ลำดับสินค้า</th>
                     <th scope="col">ชื่อสินค้า</th>
                     <th scope="col">ราคา</th>
                 </tr>
