@@ -22,12 +22,13 @@
 
     <section class="hero-section">
         <div class='container'>
-            <h1>Welcome to Game Shop</h1>
+            <h1 style="font-weight: bold;">Welcome to Game Shop</h1>
+            <a href="{% url 'products' %}"  class="btn btn-outline-light mt-4">View Products</a>
         </div>
     </section>
 
     <div class='container my-5'>
-        <h1 class='mb-4'>สินค้าแนะนำ</h1>
+        <h1 class='mb-4' style="font-weight: bold;">สินค้าแนะนำ</h1>
         <div class='row'>
             {% for product in products %}
             <div class='col-lg-4 col-md-6'>
