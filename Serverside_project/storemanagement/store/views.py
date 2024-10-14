@@ -100,3 +100,7 @@ class ProfileView(View):
         #     'form': form,
         # }
         # return render(request, 'profile.html', context)
+
+class Loginpage(View):
+    def get(self, request):
+        return render(request, 'login.html')
