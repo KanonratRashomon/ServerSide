@@ -21,10 +21,10 @@
 
     <div class='container my-5'>
         <div class='row'>
-            {% comment %} รูปภาพ {% endcomment %}
             <div class='col-md-6'>
-                <div class='col-3'>
-                </div>
+                {% if product_details.product_image %}
+                <img src="{{ product_details.product_image.url }}" class="card-img-top" alt="{{ product_details.title }}">
+                {% endif %}
             </div>
 
             <div class='col-md-6'>

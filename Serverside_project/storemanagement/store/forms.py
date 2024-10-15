@@ -14,7 +14,8 @@ class ProductForm(ModelForm):
             'price',
             'stock_quantity',
             'release_date',
-            'added_by_employee'
+            'added_by_employee',
+            'product_image'
         ]
         widgets = {
             'release_date': forms.widgets.DateInput(attrs={'type': 'date'}),

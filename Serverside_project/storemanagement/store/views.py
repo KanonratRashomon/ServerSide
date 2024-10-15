@@ -48,7 +48,7 @@ class AddProductView(View):
         return render(request, 'product_form.html', {'form': form})
 
     def post(self, request):
-        form = ProductForm(request.POST)
+        form = ProductForm(request.POST, request.FILES)
 
         if form.is_valid():
             form.save()
@@ -68,7 +68,7 @@ class UpdateProduct(View):
 
     def post(self, request, product_id):
         product = Products.objects.get(pk=product_id)
-        form = ProductForm(request.POST, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
             return redirect('products')

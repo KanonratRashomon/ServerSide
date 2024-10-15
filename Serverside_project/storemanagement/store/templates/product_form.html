@@ -58,6 +58,11 @@
                 {{ form.added_by_employee }}
             </div>
 
+            <div class="mb-3">
+                <label for="product_image" class="form-label">เพิ่มรูป</label>
+                {{ form.product_image }}
+            </div>
+
             <button type="submit" class="btn btn-primary">บันทึกสินค้า</button>
             <a href="{% url 'products' %}" class="btn btn-secondary">ยกเลิก</a>
         </form>

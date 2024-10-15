@@ -24,6 +24,7 @@ class Products(models.Model):
     price = models.FloatField()
     stock_quantity = models.IntegerField(default=0)
     release_date = models.DateField()
+    product_image = models.ImageField(null=True, blank=True, upload_to="images/")
     added_by_employee = models.ForeignKey('Employee', on_delete=models.CASCADE)
 
     def __str__(self):
