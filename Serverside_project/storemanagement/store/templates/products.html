@@ -59,11 +59,9 @@
                 {% for product in products %}
                 <tr>
                     <td>
-                        <a>
-                            {% if product.product_image %}
-                            <img src="{{ product.product_image.url }}" class="card-img-top" alt="{{ product.title }}" style="width: 100px;">
-                            {% endif %}
-                        </a>
+                        {% if product.product_image %}
+                        <img src="{{ product.product_image.url }}" class="card-img-top" alt="{{ product.title }}" style="width: 100px;">
+                        {% endif %}
                     </td>
                     <td>
                         <a href="{% url 'product_details' product.id %}" class="body-link">{{ product.title }}</a>
