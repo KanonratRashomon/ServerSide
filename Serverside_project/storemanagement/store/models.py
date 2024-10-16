@@ -1,10 +1,10 @@
 from django.db import models
 
 class Customer(models.Model):
-    username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
-    address = models.TextField()
+    first_name = models.CharField(max_length=150, null=False)
+    last_name = models.CharField(max_length=200, null=False)
+    email = models.CharField(max_length=150, null=False)
+    address = models.JSONField(null=True)
 
     def __str__(self):
         return self.username
@@ -20,7 +20,7 @@ class Orders(models.Model):
 class Products(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    product_type = models.CharField(max_length=50) #ประเภทของสินค้า(game, console)
+    product_category = models.ManyToManyField("store.Category")
     price = models.FloatField()
     stock_quantity = models.IntegerField(default=0)
     release_date = models.DateField()
@@ -52,10 +52,3 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
-class ProductCategory(models.Model):
-    product = models.ForeignKey(Products, on_delete=models.CASCADE) #อ้างอิงจาก Products
-    category = models.ForeignKey(Category, on_delete=models.CASCADE) #อ้างอิงจาก Category
-
-    def __str__(self):
-        return f"{self.product.title} - {self.category.name}"

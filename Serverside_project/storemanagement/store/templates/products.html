@@ -11,7 +11,8 @@
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
@@ -30,19 +31,22 @@
         <div class='col-lg-12'>
             <form method="GET" action="" class='mb-4'>
                 <div class='d-flex'>
-                    <select name="product_type" class="form-select filter-input" onchange="this.form.submit()">
+                    <select name="category" class="form-select filter-input" onchange="this.form.submit()">
                         <option value="">เลือกประเภทสินค้า</option>
-                        {% for product_type in product_types %}
-                        <option value="{{ product_type }}" {% if product_type == selected_product_type %}selected{% endif %}>
-                            {{ product_type }}
+                        <!-- Loop through categories passed from the view -->
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id|stringformat:"s" == selected_category %}selected{% endif %}>
+                            {{ category.name }}
                         </option>
                         {% endfor %}
                     </select>
-                    <input type="text" id="productFilter" class="form-control filter-input" placeholder="ค้นหาสินค้า...">
+                    <input type="text" id="productFilter" class="form-control filter-input"
+                        placeholder="ค้นหาสินค้า...">
                     <a class="btn btn-sm btn-primary" href="{% url 'new_product' %}">เพิ่มสินค้า</a>
                 </div>
             </form>
         </div>
+
 
         <table class='table table-borderless' id="productTable">
             <thead>
@@ -53,14 +57,15 @@
                     <th scope="col">การจัดการ</th>
                 </tr>
             </thead>
-            
-            
+
+
             <tbody>
                 {% for product in products %}
                 <tr>
                     <td>
                         {% if product.product_image %}
-                        <img src="{{ product.product_image.url }}" class="card-img-top" alt="{{ product.title }}" style="width: 100px;">
+                        <img src="{{ product.product_image.url }}" class="card-img-top" alt="{{ product.title }}"
+                            style="width: 100px;">
                         {% endif %}
                     </td>
                     <td>

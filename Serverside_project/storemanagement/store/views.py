@@ -1,12 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.views import View
 from django.utils import timezone
 from django.db.models import Q
 from store.models import *
-from .forms import ProductForm
-
+from .forms import *
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 class HomepageView(View):
     def get(self, request):
         products = Products.objects.all()
@@ -20,19 +22,19 @@ class ProductListView(View):
         products = Products.objects.all()
     
         # Get the selected product type from the request
-        selected_product_type = request.GET.get('product_type', None)
+        selected_category = request.GET.get('category', None)
 
         # If a product type is selected, filter the products
-        if selected_product_type:
-            products = products.filter(product_type=selected_product_type)
+        if selected_category:
+            products = products.filter(product_category__id=selected_category)
 
         # Get unique product types for the filter dropdown
-        product_types = Products.objects.values_list('product_type', flat=True).distinct()
+        categories = Category.objects.all()
 
         context = {
             'products': products,
-            'product_types': product_types,
-            'selected_product_type': selected_product_type,
+            'categories': categories,
+            'selected_category': selected_category,
         }
         return render(request, 'products.html', context)
 
@@ -101,6 +103,33 @@ class ProfileView(View):
         # }
         # return render(request, 'profile.html', context)
 
-class Loginpage(View):
+class Register(View):
     def get(self, request):
-        return render(request, 'login.html')
+        form = CreateUserForm()
+        return render(request, 'register.html', {'form': form})
+
+    def post(self, request):
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+        return render(request, 'register.html', {'form': form})
+
+class Login(View):
+    def get(self, request):
+        form = AuthenticationForm()
+        return render(request, 'login.html', {"form": form})
+
+    def post(self, request):
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user() 
+            login(request,user)
+            return redirect('homepage')  
+
+        return render(request,'login.html', {"form":form})
+
+class Logout(View):
+    def get(self, request):
+        logout(request)
+        return redirect('login')
