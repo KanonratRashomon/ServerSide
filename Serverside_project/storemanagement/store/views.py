@@ -8,9 +8,11 @@ from store.models import *
 from .forms import *
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
-class HomepageView(View):
+class HomepageView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request):
         products = Products.objects.all()
 
@@ -18,7 +20,9 @@ class HomepageView(View):
             'products': products
         })
     
-class ProductListView(View):
+class ProductListView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request):
         products = Products.objects.all()
     
@@ -39,13 +43,17 @@ class ProductListView(View):
         }
         return render(request, 'products.html', context)
 
-class ProductDetailView(View):
+class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request, product_id):
         product_details = Products.objects.get(pk=product_id)
 
         return render(request, 'product_detail.html', {'product_details': product_details})
 
-class AddProductView(View):
+class AddProductView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request):
         form = ProductForm()
         return render(request, 'product_form.html', {'form': form})
@@ -57,13 +65,15 @@ class AddProductView(View):
             form.save()
             return redirect('products')
 
-class DelProduct(View):
+class DelProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, product_id):
         product = Products.objects.get(pk=product_id)
         product.delete()
         return redirect('products')
 
-class UpdateProduct(View):
+class UpdateProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request, product_id):
         product = Products.objects.get(pk=product_id)
         form = ProductForm(instance=product)
@@ -79,7 +89,9 @@ class UpdateProduct(View):
         return render(request, 'product_form.html', {'form': form})
 
 
-class ProfileView(View):
+class ProfileView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request):
         # user_profile, created = UserProfile.objects.get_or_create(user=request.user)
         # form = UserProfileForm(instance=user_profile)
@@ -135,7 +147,9 @@ class Logout(View):
         logout(request)
         return redirect('login')
 
-class CartView(View):
+class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request):
         cart = request.session.get('cart', {})
         cart_items = []
@@ -182,7 +196,9 @@ class CartView(View):
         return redirect('cart')
 
 
-class RemoveFromCartView(View):
+class RemoveFromCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def post(self, request, product_id):
         cart = request.session.get('cart', {})
         if str(product_id) in cart:
