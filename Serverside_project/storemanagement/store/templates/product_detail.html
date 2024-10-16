@@ -6,13 +6,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>product details</title>
+    <title>Product Details</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"rel="stylesheet">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -28,22 +27,26 @@
             </div>
 
             <div class='col-md-6'>
-                <h1 class='mb-3' style="font-weight: bold;">{{product_details.title}}</h1>
-                <p class='price mb-2'>ราคา: ${{product_details.price}}</p>
-                <button class="btn btn-primary btn-lg add-to-cart-btn w-100 mb-3">เพิ่มลงตะกร้า</button>
+                <h1 class='mb-3' style="font-weight: bold;">{{ product_details.title }}</h1>
+                <p class='price mb-2'>ราคา: ${{ product_details.price }}</p>
+                <form method="POST" action="{% url 'add_to_cart' product_details.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">เพิ่มลงในตะกร้า</button>
+                </form>
+
                 <div class='card mb-3'>
                     <div class='card-body'>
                         <h5 class='card-title' style="font-weight: bold;">รายละเอียดสินค้า</h5>
-                        <p class='card-text'>{{product_details.description}}</p>
+                        <p class='card-text'>{{ product_details.description }}</p>
                     </div>
-
                 </div>
             </div>
         </div>
+    </div>
 
-
-            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="{% static 'order.js' %}"></script>
 </body>
 
 </html>
