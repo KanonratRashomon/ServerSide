@@ -159,9 +159,28 @@ class ChangePassword(View):
             messages.error(request, 'Please correct the error below.')
             return render(request, 'change_password.html', {'form': form})
 
-class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    login_url = '/login/'
-    permission_required = ["store.view_products"]
+class AddToCartView(View):
+    def post(self, request, product_id):
+        try:
+            product = Products.objects.get(id=product_id)
+        except Products.DoesNotExist:
+            messages.error(request, "สินค้าที่คุณพยายามเพิ่มไม่มีในระบบ.")
+            return redirect('products')
+
+        cart = request.session.get('cart', {})
+        quantity = int(request.POST.get('quantity', 1))
+
+        if str(product_id) in cart:
+            cart[str(product_id)] += quantity 
+        else:
+            cart[str(product_id)] = quantity 
+            
+        request.session['cart'] = cart
+        messages.success(request, f'เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว: {product.title} จำนวน {quantity} ชิ้น')
+        
+        return redirect('cart')  # Redirect to cart view
+
+class CartView(View):
     def get(self, request):
         cart = request.session.get('cart', {})
         cart_items = []
@@ -169,9 +188,6 @@ class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         for product_id, quantity in cart.items():
             try:
-                if not product_id.isdigit():
-                    raise ValueError(f'Invalid product ID: {product_id}')
-                
                 product = Products.objects.get(id=product_id)
                 subtotal = product.price * quantity
                 total += subtotal
@@ -182,8 +198,6 @@ class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 })
             except Products.DoesNotExist:
                 messages.warning(request, f'Product ID {product_id} not found.')
-            except ValueError as e:
-                messages.error(request, str(e))
 
         context = {
             'cart_items': cart_items,
@@ -192,38 +206,73 @@ class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return render(request, 'cart.html', context)
 
     def post(self, request, product_id):
-        # เพิ่มสินค้าในตะกร้า
         cart = request.session.get('cart', {})
-        quantity = int(request.POST.get('quantity', 1))  # ใช้จำนวนที่กำหนดโดยผู้ใช้
-
-        # ตรวจสอบว่าสินค้าในตะกร้ามีอยู่แล้วหรือยัง
+        quantity = int(request.POST.get('quantity', 1))
         if str(product_id) in cart:
-            cart[str(product_id)] += quantity  # เพิ่มจำนวน
+            cart[str(product_id)] += quantity 
+            messages.info(request, f'เพิ่มสินค้า ID {product_id} จำนวน {quantity} ชิ้นในตะกร้าแล้ว')
         else:
-            cart[str(product_id)] = quantity  # สร้างรายการใหม่
+            cart[str(product_id)] = quantity
+            messages.success(request, f'เพิ่มสินค้า ID {product_id} ลงในตะกร้าแล้ว: {quantity} ชิ้น')
 
-        # บันทึกตะกร้าลงใน session
         request.session['cart'] = cart
-        messages.success(request, f'เพิ่มสินค้าลงในตะกร้าแล้ว: {quantity} ชิ้น')
         return redirect('cart')
-
 
 class RemoveFromCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     permission_required = ["store.view_products"]
+
     def post(self, request, product_id):
+        print(f"Request to remove product ID: {product_id}")
         cart = request.session.get('cart', {})
+        print(f"Current cart: {cart}")
+
         if str(product_id) in cart:
             if cart[str(product_id)] > 1:
-                # ลดจำนวนสินค้าลง 1
                 cart[str(product_id)] -= 1
-                messages.success(request, 'ลดจำนวนสินค้าจากตะกร้าเรียบร้อยแล้ว')
             else:
-                # ถ้าจำนวนสินค้าน้อยกว่าหรือเท่ากับ 1 ให้ลบออกจากตะกร้า
                 del cart[str(product_id)]
-                messages.success(request, 'ลบสินค้าจากตะกร้าเรียบร้อยแล้ว')
         else:
-            messages.warning(request, 'ไม่พบสินค้านี้ในตะกร้า')
+            print(f"Product ID {product_id} not in cart")
 
         request.session['cart'] = cart
         return redirect('cart')
+
+class CheckoutView(View):
+    def post(self, request):
+        cart = request.session.get('cart', {})
+        total = 0
+
+        # คำนวณราคารวมจากตะกร้า
+        for product_id, quantity in cart.items():
+            try:
+                product = Products.objects.get(id=product_id)
+                total += product.price * quantity
+            except Products.DoesNotExist:
+                messages.error(request, f'สินค้า ID {product_id} ไม่พบ')
+                return redirect('cart')
+
+        # แสดงข้อความสำเร็จ
+        messages.success(request, f'คุณมีสินค้าที่จะชำระเงินทั้งหมด: ฿{total}')
+        
+        # ลบสินค้าจากตะกร้า
+        request.session['cart'] = {}  # ลบสินค้าทั้งหมดออกจากตะกร้า หรือเปลี่ยนตามต้องการ
+
+        return redirect('products')  # เปลี่ยนเส้นทางไปยังหน้าสินค้า
+
+    def get(self, request):
+        cart = request.session.get('cart', {})
+        total = 0
+        cart_items = []
+
+        for product_id, quantity in cart.items():
+            try:
+                product = Products.objects.get(id=product_id)
+                subtotal = product.price * quantity
+                total += subtotal
+                cart_items.append({'product': product, 'quantity': quantity, 'subtotal': subtotal})
+            except Products.DoesNotExist:
+                messages.error(request, f'สินค้า ID {product_id} ไม่พบ')
+                continue
+
+        return render(request, 'checkout.html', {'cart_items': cart_items, 'total': total})
