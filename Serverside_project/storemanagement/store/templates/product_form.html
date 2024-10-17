@@ -19,6 +19,7 @@
     {% include 'nav.html' %}
     <div class="container my-5">
         <h1>{{ form.instance.pk|yesno:"Edit Product,Create Product" }}</h1>
+        {{form.errors}}
 
         <form method="POST" enctype="multipart/form-data" class="mt-4">
             {% csrf_token %}
@@ -35,7 +36,7 @@
 
             <div class="mb-3">
                 <label for="product_type" class="form-label">ประเภทสินค้า</label>
-                {{ form.product_type }}
+                {{ form.product_category }}
             </div>
 
             <div class="mb-3">

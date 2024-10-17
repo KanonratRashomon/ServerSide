@@ -42,7 +42,11 @@
                     </select>
                     <input type="text" id="productFilter" class="form-control filter-input"
                         placeholder="ค้นหาสินค้า...">
+
+                    <!-- ถ้าไม่มี add_products permission จะไม่แสดงปุ่ม เพิ่มสินค้า -->
+                    {% if perms.store.add_products %}
                     <a class="btn btn-sm btn-primary" href="{% url 'new_product' %}">เพิ่มสินค้า</a>
+                    {% endif %}
                 </div>
             </form>
         </div>
@@ -54,7 +58,9 @@
                     <th scope="col">ภาพ</th>
                     <th scope="col">ชื่อสินค้า</th>
                     <th scope="col">ราคา</th>
+                    {% if perms.store.change_products %}
                     <th scope="col">การจัดการ</th>
+                    {% endif %}
                 </tr>
             </thead>
 
@@ -73,8 +79,13 @@
                     </td>
                     <td>${{ product.price }}</td>
                     <td>
+                        <!-- ถ้าไม่มี permission จะไม่แสดงปุ่ม -->
+                        {% if perms.store.change_products %}
                         <a class="btn btn-sm btn-warning" href="{% url 'update_product' product.id %}">แก้ไข</a>
+                        {% endif %}
+                        {% if perms.store.delete_products %}
                         <a class="btn btn-sm btn-danger" href="{% url 'remove_product' product.id %}">ลบ</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

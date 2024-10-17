@@ -19,11 +19,7 @@
         <div class="row">
             <div class="col-md-4 d-flex justify-content-center">
                 <div class="profile-picture">
-                    {% if user_profile.profile_picture %}
-                        <img src="{{ user_profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded-circle shadow mb-3"style="width: 150px;">
-                    {% else %}
                     <img src="{% static 'images/default-profile.jpg' %}" alt="Default Profile Picture" class="img-fluid rounded-circle shadow mb-3" style="width: 150px;">
-                    {% endif %}
                 </div>
             </div>
 
@@ -31,8 +27,9 @@
                 <div class="card shadow p-4">
                     <h3>Name:{{ user.username }}</h3>
                     <p><strong>Email:</strong> {{ user.email }}</p>
-                    <p><strong>Bio:</strong> {{ user_profile.bio }}</p>
-                    <p><strong>Phone Number:</strong> {{ user_profile.phone_number }}</p>
+                    <p><strong>Firstname:</strong> {{ user.first_name }}</p>
+                    <p><strong>Lastname:</strong> {{ user.last_name }}</p>
+                    <p><strong>Address:</strong> {{ user.address }}</p>
                 </div>
             </div>
 

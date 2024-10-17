@@ -53,7 +53,7 @@ class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class AddProductView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
-    permission_required = ["store.view_products"]
+    permission_required = ["store.add_products"]
     def get(self, request):
         form = ProductForm()
         return render(request, 'product_form.html', {'form': form})
@@ -66,6 +66,8 @@ class AddProductView(LoginRequiredMixin, PermissionRequiredMixin, View):
             return redirect('products')
 
 class DelProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.delete_products"]
     def get(self, request, product_id):
         product = Products.objects.get(pk=product_id)
         product.delete()
@@ -73,7 +75,7 @@ class DelProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class UpdateProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
-    permission_required = ["store.view_products"]
+    permission_required = ["store.change_products"]
     def get(self, request, product_id):
         product = Products.objects.get(pk=product_id)
         form = ProductForm(instance=product)
