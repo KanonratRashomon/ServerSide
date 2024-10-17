@@ -11,7 +11,7 @@
 
 <body>
     {% include 'nav.html' %}
-    <div class="container my-5">
+    <div class="container-sm border my-3">
         <h1>ตะกร้าสินค้า</h1>
         {% if cart_items %}
             <table class="table">
@@ -23,26 +23,28 @@
                         <th>รวม</th>
                     </tr>
                 </thead>
-{% for item in cart_items %}
-    <tr>
-        <td>{{ item.product.title }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>{{ item.product.price|floatformat:2 }}</td>
-        <td>{{ item.subtotal|floatformat:2 }}</td>
-        <td>
-            <form action="{% url 'remove_from_cart' item.product.id %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-sm">ลบ</button>
-            </form>
-        </td>
-    </tr>
-{% endfor %}
+                {% for item in cart_items %}
+                <tr>
+                    <td>{{ item.product.title }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.product.price|floatformat:2 }}</td>
+                    <td>{{ item.subtotal|floatformat:2 }}</td>
+                    <td>
+                        <form action="{% url 'remove_from_cart' item.product.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">ลบ</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
             </table>
-            <h3>รวมทั้งหมด: ${{ total }}</h3>
+            <h3 class="text-end">รวมทั้งหมด: ${{ total }}</h3>
         {% else %}
             <p>ตะกร้าของคุณว่างเปล่า</p>
         {% endif %}
-        <a href="{% url 'products' %}" class="btn btn-secondary">กลับไปยังหน้าสินค้า</a>
+        <div class='text-end mt-3 mb-3'>
+            <a href="{% url 'products' %}" class="btn btn-primary ">กลับไปยังหน้าสินค้า</a>
+        </div>
     </div>
 </body>
 

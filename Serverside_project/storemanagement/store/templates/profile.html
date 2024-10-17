@@ -25,22 +25,18 @@
 
             <div class="col-md-8">
                 <div class="card shadow p-4">
-                    <h3>Name:{{ user.username }}</h3>
+                    <h3>Welcome {{ user.username }} !!</h3>
                     <p><strong>Email:</strong> {{ user.email }}</p>
                     <p><strong>Firstname:</strong> {{ user.first_name }}</p>
                     <p><strong>Lastname:</strong> {{ user.last_name }}</p>
-                    <p><strong>Address:</strong> {{ user.address }}</p>
                 </div>
             </div>
 
         </div>
 
-        <h2 class="mt-4">แก้ไขโปรไฟล์</h2>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">บันทึก</button>
-        </form>
+        <a class="btn btn-sm btn-primary" href="{% url 'update_profile' %}">Edit Profile</a>
+        <a class="btn btn-sm btn-warning" href="{% url 'change_password' %}">Change password</a>
+        <a class="btn btn-sm btn-danger" href="{% url 'logout' %}">Logout</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>

@@ -15,24 +15,24 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'products' %}">Products</a>
                         </li>
+                        {% if user.is_authenticated %}
+                        <!-- แสดงปุ่มโปร๋ไฟล์เมื่อผู้ใช้ login -->
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'profile' %}">Profile</a>
                         </li>
+                        {% else %}
+                        <!-- แสดงปุ่ม login แทนปุ่ม profile -->
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'login' %}">Login</a>
-                        </li>                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                         </li>
+                        {% endif %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'cart' %}">Cart</a>
                         </li>
-
                     </ul>
                 </div>
             </div>
         </nav>
-        
     </header>
 </div>
 </html>

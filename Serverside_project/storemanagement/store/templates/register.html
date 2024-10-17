@@ -31,6 +31,18 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label for="new_firstname">Firstname</label>
+                                <div class="control">
+                                    {{form.first_name}}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-lastname">Lastname</label>
+                                <div class="control">
+                                    {{form.last_name}}
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label for="new-email">email</label>
                                 <div class="control">
                                     {{form.email}}
@@ -41,14 +53,15 @@
                                 <div class="control">
                                     {{form.password1}}
                                 </div>
+                                {{ form.password1.errors }}
                             </div>
                             <div class="form-group">
                                 <label for="confirm-password">Confirm Password</label>
                                 <div class="control">
                                     {{form.password2}}
                                 </div>
+                                {{ form.password2.errors }}
                             </div>
-                            {{form.errors}}
                             <button type="submit" class="btn btn-success btn-block">Create Account</button>
                             <div class="text-center mt-3">
                                 <a href="{% url 'login' %}">Already have an account?</a>

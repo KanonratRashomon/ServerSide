@@ -1,18 +1,13 @@
 from django.shortcuts import render, redirect
-from datetime import datetime, timedelta
-from django.shortcuts import render, redirect
 from django.views import View
-from django.utils import timezone
 from django.db.models import Q
 from store.models import *
 from .forms import *
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
-class HomepageView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    login_url = '/login/'
-    permission_required = ["store.view_products"]
+class HomepageView(View):
     def get(self, request):
         products = Products.objects.all()
 
@@ -95,28 +90,27 @@ class ProfileView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     permission_required = ["store.view_products"]
     def get(self, request):
-        # user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-        # form = UserProfileForm(instance=user_profile)
-        
-        # context = {
-        #     'user_profile': user_profile,
-        #     'form': form,
-        # }
-        return render(request, 'profile.html')
+        user = User.objects.get(username=request.user)
+        return render(request, 'profile.html', {'user': user})
+    
+class UserProfileUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ['store.view_products']
+    def get(self, request):
+        user = request.user
+        form = UserProfileForm(instance=user)
 
-    # def post(self, request):
-        # user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-        # form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        return render(request, 'profile_form.html', {'form': form})
+
+    def post(self, request):
+        user = request.user
+        form = UserProfileForm(request.POST, instance=user)
         
-        # if form.is_valid():
-        #     form.save()
-        #     return redirect('profile')
-        
-        # context = {
-        #     'user_profile': user_profile,
-        #     'form': form,
-        # }
-        # return render(request, 'profile.html', context)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+        else:
+            return render(request, 'profile_form.html', {'form': form})
 
 class Register(View):
     def get(self, request):
@@ -147,7 +141,23 @@ class Login(View):
 class Logout(View):
     def get(self, request):
         logout(request)
-        return redirect('login')
+        return redirect('homepage')
+
+class ChangePassword(View):
+    def get(self, request):
+        form = PasswordChangeForm(user=request.user)
+        return render(request, 'change_password.html', {'form': form})
+
+    def post(self, request):
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important for keeping the user logged in
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Please correct the error below.')
+            return render(request, 'change_password.html', {'form': form})
 
 class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
