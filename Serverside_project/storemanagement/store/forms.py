@@ -12,6 +12,7 @@ class ProductForm(ModelForm):
             'description',
             'product_category',
             'price',
+            'discount',
             'stock_quantity',
             'release_date',
             'added_by_employee',

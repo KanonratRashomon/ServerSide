@@ -22,6 +22,7 @@ class Products(models.Model):
     description = models.TextField()
     product_category = models.ManyToManyField("store.Category")
     price = models.FloatField()
+    discount = models.FloatField(default=0)
     stock_quantity = models.IntegerField(default=0)
     release_date = models.DateField()
     product_image = models.ImageField(null=True, blank=True, upload_to="images/")
@@ -29,6 +30,12 @@ class Products(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_discounted_price(self):
+        if self.discount > 0:
+            discount_amount = (self.discount / 100) * self.price
+            return self.price - discount_amount
+        return self.price
 
 class Employee(models.Model):
     first_name = models.CharField(max_length=100)

@@ -193,7 +193,7 @@ class CartView(View):
         for product_id, quantity in cart.items():
             try:
                 product = Products.objects.get(id=product_id)
-                subtotal = product.price * quantity
+                subtotal = product.get_discounted_price() * quantity
                 total += subtotal
                 cart_items.append({
                     'product': product,
@@ -253,7 +253,7 @@ class CheckoutView(View):
         for product_id, quantity in cart.items():
             try:
                 product = Products.objects.get(id=product_id)
-                total += product.price * quantity
+                total += product.get_discounted_price() * quantity
             except Products.DoesNotExist:
                 messages.error(request, f'สินค้า ID {product_id} ไม่พบ')
                 return redirect('cart')
@@ -274,7 +274,7 @@ class CheckoutView(View):
         for product_id, quantity in cart.items():
             try:
                 product = Products.objects.get(id=product_id)
-                subtotal = product.price * quantity
+                subtotal = product.get_discounted_price() * quantity
                 total += subtotal
                 cart_items.append({'product': product, 'quantity': quantity, 'subtotal': subtotal})
             except Products.DoesNotExist:

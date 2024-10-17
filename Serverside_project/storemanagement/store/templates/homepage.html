@@ -11,7 +11,8 @@
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -22,7 +23,7 @@
     <section class="hero-section">
         <div class='container'>
             <h1 style="font-weight: bold;">Welcome to Game Shop</h1>
-            <a href="{% url 'products' %}"  class="btn btn-outline-light mt-4">View Products</a>
+            <a href="{% url 'products' %}" class="btn btn-outline-light mt-4">View Products</a>
         </div>
     </section>
 
@@ -38,7 +39,13 @@
                         {% endif %}
                         <div class='card-body'>
                             <h5 class="card-title">{{ product.title }}</h5>
+                            {% if product.discount > 0 %}
+                            <p class="card-text">ราคาปกติ: <s>${{ product.price }}</s></p>
+                            <p class="card-text">ส่วนลด: {{ product.discount }}%</p>
+                            <p class="card-text">เหลือเพียง: ${{ product.get_discounted_price|floatformat:2 }}</p>
+                            {% else %}
                             <p class="card-text">ราคา: ${{ product.price }}</p>
+                            {% endif %}
                         </div>
                     </div>
                 </a>

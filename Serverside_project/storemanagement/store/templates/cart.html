@@ -15,41 +15,48 @@
         <div class="col-md-12">
             <h1>ตะกร้าสินค้า</h1>
             {% if cart_items %}
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ชื่อสินค้า</th>
-                            <th>จำนวน</th>
-                            <th>ราคา</th>
-                            <th>รวม</th>
-                            <th>การจัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in cart_items %}
-                            <tr>
-                                <td>{{ item.product.title }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>{{ item.product.price|floatformat:2 }}</td>
-                                <td>{{ item.subtotal|floatformat:2 }}</td>
-                                <td>
-                                    <form action="{% url 'remove_from_cart' item.product.id %}" method="post" style="display:inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-sm">ลบ</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <h3 class='text-end'>รวมทั้งหมด: ฿{{ total|floatformat:2 }}</h3>
-                
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ชื่อสินค้า</th>
+                        <th>จำนวน</th>
+                        <th>ราคา</th>
+                        <th>รวม</th>
+                        <th>การจัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.product.title }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>
+                            {% if item.product.discount > 0 %}
+                            <s>${{ item.product.price|floatformat:2 }}</s> ${{ item.product.get_discounted_price|floatformat:2 }}
+                            {% else %}
+                            ${{ item.product.price|floatformat:2 }}
+                            {% endif %}
+                        </td>
+                        <td>{{ item.subtotal|floatformat:2 }}</td>
+                        <td>
+                            <form action="{% url 'remove_from_cart' item.product.id %}" method="post"
+                                style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">ลบ</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h3 class='text-end'>รวมทั้งหมด: ${{ total|floatformat:2 }}</h3>
 
-                <div class='text-end mt-3'>
-                    <a href="{% url 'checkout' %}" class="btn btn-success">ชำระเงิน</a>
-                </div>
+
+            <div class='text-end mt-3'>
+                <a href="{% url 'checkout' %}" class="btn btn-success">ชำระเงิน</a>
+            </div>
             {% else %}
-                <p>ตะกร้าของคุณว่างเปล่า</p>
+            <p>ตะกร้าของคุณว่างเปล่า</p>
             {% endif %}
             <div class='text-end mt-3 mb-3'>
                 <a href="{% url 'products' %}" class="btn btn-primary">กลับไปยังหน้าสินค้า</a>

@@ -77,7 +77,7 @@
                     <td>
                         <a href="{% url 'product_details' product.id %}" class="body-link">{{ product.title }}</a>
                     </td>
-                    <td>${{ product.price }}</td>
+                    <td>${{ product.get_discounted_price|floatformat:2 }}</td>
                     <td>
                         <!-- ถ้าไม่มี permission จะไม่แสดงปุ่ม -->
                         {% if perms.store.change_products %}

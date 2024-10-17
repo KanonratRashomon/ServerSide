@@ -28,7 +28,7 @@
 
             <div class='col-md-6'>
                 <h1 class='mb-3' style="font-weight: bold;">{{ product_details.title }}</h1>
-                <p class='price mb-2'>ราคา: ${{ product_details.price }}</p>
+                <p class='price mb-2'>ราคา: ${{ product_details.get_discounted_price|floatformat:2 }}</p>
                 <form method="POST" action="{% url 'add_to_cart' product_details.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">เพิ่มลงในตะกร้า</button>
