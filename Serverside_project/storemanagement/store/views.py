@@ -160,6 +160,8 @@ class ChangePassword(View):
             return render(request, 'change_password.html', {'form': form})
 
 class AddToCartView(View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def post(self, request, product_id):
         try:
             product = Products.objects.get(id=product_id)
@@ -181,6 +183,8 @@ class AddToCartView(View):
         return redirect('cart')  # Redirect to cart view
 
 class CartView(View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request):
         cart = request.session.get('cart', {})
         cart_items = []
@@ -239,6 +243,8 @@ class RemoveFromCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return redirect('cart')
 
 class CheckoutView(View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def post(self, request):
         cart = request.session.get('cart', {})
         total = 0

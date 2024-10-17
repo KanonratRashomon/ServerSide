@@ -40,15 +40,14 @@ class CreateUserForm(UserCreationForm):
         cleaned_data = super().clean()
         return cleaned_data
 
-    # def save(self, commit=True):
-    #     user = super().save(commit=False)
-    #     user.is_staff = True
-    #     if commit:
-    #         user.save()
-    #         # เพิ่มผู้ใช้เข้าไปในกลุ่ม Staff
-    #         staff_group = Group.objects.get(name='Customer')  # สร้างกลุ่มถ้ายังไม่มี
-    #         user.groups.add(staff_group)  # เพิ่มผู้ใช้เข้าไปในกลุ่ม
-    #     return user
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+            # เพิ่มผู้ใช้เข้าไปในกลุ่ม Customer
+            customer_group = Group.objects.get(name='Customer')
+            user.groups.add(customer_group)
+        return user
 
 class UserProfileForm(ModelForm):
     class Meta:

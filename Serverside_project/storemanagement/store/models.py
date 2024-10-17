@@ -52,23 +52,3 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
-class Cart(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='carts')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Cart {self.id} for {self.customer.first_name} {self.customer.last_name}"
-
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-
-    @property
-    def subtotal(self):
-        return self.product.price * self.quantity
-
-    def __str__(self):
-        return f"{self.quantity} x {self.product.title} in Cart {self.cart.id}"
