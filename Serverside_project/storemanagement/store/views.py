@@ -186,7 +186,7 @@ class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
         except Products.DoesNotExist:
             return redirect('cart')
 
-        quantity = int(request.POST.get('quantity', 1)) ##จำนวนสินค้าที่ต้องการ
+        
 
         if request.user.is_authenticated:
             cart, created = Cart.objects.get_or_create(user=request.user) ##ค้นหาหรือสร้างตะกร้า
@@ -196,7 +196,7 @@ class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 product=product,
                 defaults={'quantity': 0, 'user': request.user}
             )
-            cart_item.quantity += quantity
+            cart_item.quantity += 1
             cart_item.save()
 
         return redirect('cart')
