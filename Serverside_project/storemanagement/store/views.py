@@ -178,19 +178,11 @@ class AddToCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
             cart_item, created = CartItem.objects.get_or_create(
                 cart=cart,
                 product=product,
-                defaults={'quantity': 0, 'user': request.user if request.user.is_authenticated else None}
+                defaults={'quantity': 0, 'user': request.user if request.user.is_authenticated else None} ##
             )
 
             cart_item.quantity += quantity
             cart_item.save()
-        else:
-            cart = request.session.get('cart', {})
-            if str(product_id) in cart:
-                cart[str(product_id)] += quantity
-            else:
-                cart[str(product_id)] = quantity
-            
-            request.session['cart'] = cart
         return redirect('cart')
 
 
