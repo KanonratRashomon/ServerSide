@@ -161,29 +161,7 @@ class ChangePassword(View):
 
 
 
-class AddToCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    login_url = '/login/'
-    permission_required = ["store.view_products"]
-    def post(self, request, product_id):
-        try:
-            product = Products.objects.get(id=product_id)
-        except Products.DoesNotExist:
-            return redirect('products')
 
-        quantity = int(request.POST.get('quantity', 1))
-
-        if request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=request.user)
-
-            cart_item, created = CartItem.objects.get_or_create(
-                cart=cart,
-                product=product,
-                defaults={'quantity': 0, 'user': request.user if request.user.is_authenticated else None} ##
-            )
-
-            cart_item.quantity += quantity
-            cart_item.save()
-        return redirect('cart')
 
 
 class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -191,15 +169,10 @@ class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = ["store.view_products"]
     def get(self, request):
         if request.user.is_authenticated:
-            cart_items = CartItem.objects.filter(cart__user=request.user)
+            cart_items = CartItem.objects.filter(cart__user=request.user) #ค้นหาสินค้าในตะกร้าของ User
             total = sum(item.product.get_discounted_price() * item.quantity for item in cart_items)
-        else:
-            cart = request.session.get('cart', {})
-            cart_items = []
-            total = 0
 
-
-
+        ##ส่งข้อมูลไปยัง template
         context = {
             'cart_items': cart_items,
             'total': total,
@@ -209,29 +182,22 @@ class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def post(self, request, product_id):
         try:
-            product = Products.objects.get(id=product_id)
+            product = Products.objects.get(id=product_id) 
         except Products.DoesNotExist:
             return redirect('cart')
 
-        quantity = int(request.POST.get('quantity', 1))
+        quantity = int(request.POST.get('quantity', 1)) ##จำนวนสินค้าที่ต้องการ
 
         if request.user.is_authenticated:
-            cart, created = Cart.objects.get_or_create(user=request.user)
+            cart, created = Cart.objects.get_or_create(user=request.user) ##ค้นหาหรือสร้างตะกร้า
 
-            cart_item, created = CartItem.objects.get_or_create(
+            cart_item, created = CartItem.objects.get_or_create( ##ค้นหาหรือสร้างสินค้า
                 cart=cart,
                 product=product,
                 defaults={'quantity': 0, 'user': request.user}
             )
             cart_item.quantity += quantity
             cart_item.save()
-        else:
-            cart = request.session.get('cart', {})
-            if str(product_id) in cart:
-                cart[str(product_id)] += quantity
-            else:
-                cart[str(product_id)] = quantity
-            request.session['cart'] = cart
 
         return redirect('cart')
 
@@ -241,9 +207,8 @@ class RemoveFromCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self, request, product_id):
         if request.user.is_authenticated:
             try:
-                # Retrieve the cart associated with the authenticated user
-                cart = Cart.objects.get(user=request.user)
-                cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+                cart = Cart.objects.get(user=request.user)##เรียกดูตะกร้า
+                cart_item = CartItem.objects.get(cart=cart, product_id=product_id)##เรียกดูรายการสินค้า
 
                 if cart_item.quantity > 1:
                     cart_item.quantity -= 1
@@ -252,26 +217,10 @@ class RemoveFromCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     cart_item.delete()
 
             except Cart.DoesNotExist:
-                messages.error(request, "ไม่พบตะกร้าของคุณ.")
                 return redirect('cart')
             except CartItem.DoesNotExist:
-                messages.error(request, "สินค้าที่คุณพยายามลบไม่มีในตะกร้า.")
                 return redirect('cart')
 
-        else:
-            # Handle cases for anonymous users (session-based cart)
-            cart = request.session.get('cart', {})
-            if str(product_id) in cart:
-                if cart[str(product_id)] > 1:
-                    cart[str(product_id)] -= 1
-                else:
-                    del cart[str(product_id)]
-            else:
-                messages.error(request, "สินค้าที่คุณพยายามลบไม่มีในตะกร้า.")
-
-            request.session['cart'] = cart
-
-        messages.success(request, "ลบสินค้าจากตะกร้าเรียบร้อยแล้ว")
         return redirect('cart')
 
 
@@ -288,6 +237,7 @@ class CheckoutView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         total_price = sum(item.product.get_discounted_price() * item.quantity for item in cart_items)
 
+        ##ส่งข้อมูลไปยัง template
         context = {
             'cart_items': cart_items,
             'total_price': total_price,
@@ -299,12 +249,7 @@ class CheckoutView(LoginRequiredMixin, PermissionRequiredMixin, View):
             cart = Cart.objects.get(user=request.user)
             cart_items = cart.items.all()
         except Cart.DoesNotExist:
-            messages.error(request, "ไม่พบสินค้าในตะกร้า")
-            return redirect('view_cart')
-
-        if not cart_items:
-            messages.error(request, "ตะกร้าของคุณว่างเปล่า")
-            return redirect('view_cart')
+            return redirect('cart')
 
         total_price = sum(item.product.get_discounted_price() * item.quantity for item in cart_items)
 
@@ -324,7 +269,6 @@ class CheckoutView(LoginRequiredMixin, PermissionRequiredMixin, View):
         cart.items.all().delete()
         cart.delete()
 
-        messages.success(request, "การสั่งซื้อของคุณเสร็จสมบูรณ์")
         return redirect('order_history')
 
 class OrderHistoryView(LoginRequiredMixin, PermissionRequiredMixin, View):
