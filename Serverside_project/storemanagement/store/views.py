@@ -159,6 +159,8 @@ class ChangePassword(View):
             messages.error(request, 'Please correct the error below.')
             return render(request, 'change_password.html', {'form': form})
 
+
+
 class AddToCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = '/login/'
     permission_required = ["store.view_products"]
@@ -204,15 +206,7 @@ class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
             cart_items = []
             total = 0
 
-            for product_id, quantity in cart.items():
-                product = Products.objects.get(id=product_id)
-                subtotal = product.get_discounted_price() * quantity
-                total += subtotal
-                cart_items.append({
-                    'product': product,
-                    'quantity': quantity,
-                    'subtotal': subtotal
-                })
+
 
         context = {
             'cart_items': cart_items,
