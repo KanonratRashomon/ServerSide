@@ -40,8 +40,7 @@
                         </option>
                         {% endfor %}
                     </select>
-                    <input type="text" id="productFilter" class="form-control filter-input"
-                        placeholder="ค้นหาสินค้า...">
+                    <input type="text" id="productFilter" class="form-control filter-input" placeholder="ค้นหาสินค้า...">
 
                     <!-- ถ้าไม่มี add_products permission จะไม่แสดงปุ่ม เพิ่มสินค้า -->
                     {% if perms.store.add_products %}

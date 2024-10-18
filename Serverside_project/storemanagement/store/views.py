@@ -159,7 +159,9 @@ class ChangePassword(View):
             messages.error(request, 'Please correct the error below.')
             return render(request, 'change_password.html', {'form': form})
 
-class AddToCartView(View):
+class AddToCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def post(self, request, product_id):
         try:
             product = Products.objects.get(id=product_id)
@@ -190,11 +192,13 @@ class AddToCartView(View):
         return redirect('cart')
 
 
-class CartView(View):
+class CartView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request):
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(cart__user=request.user)
-            total = sum(item.product.price * item.quantity for item in cart_items)
+            total = sum(item.product.get_discounted_price() * item.quantity for item in cart_items)
         else:
             cart = request.session.get('cart', {})
             cart_items = []
@@ -202,7 +206,7 @@ class CartView(View):
 
             for product_id, quantity in cart.items():
                 product = Products.objects.get(id=product_id)
-                subtotal = product.price * quantity
+                subtotal = product.get_discounted_price() * quantity
                 total += subtotal
                 cart_items.append({
                     'product': product,
@@ -245,7 +249,9 @@ class CartView(View):
 
         return redirect('cart')
 
-class RemoveFromCartView(View):
+class RemoveFromCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def post(self, request, product_id):
         if request.user.is_authenticated:
             try:
@@ -284,7 +290,9 @@ class RemoveFromCartView(View):
 
 
 
-class CheckoutView(View):
+class CheckoutView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request):
         try:
             cart = Cart.objects.get(user=request.user)
@@ -333,7 +341,9 @@ class CheckoutView(View):
         messages.success(request, "การสั่งซื้อของคุณเสร็จสมบูรณ์")
         return redirect('order_history')
 
-class OrderHistoryView(View):
+class OrderHistoryView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    login_url = '/login/'
+    permission_required = ["store.view_products"]
     def get(self, request):
         orders = Order.objects.filter(user=request.user).order_by('-created_at')
         return render(request, 'order_history.html', {'orders': orders})

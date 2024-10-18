@@ -21,7 +21,6 @@
                         <th>ชื่อสินค้า</th>
                         <th>จำนวน</th>
                         <th>ราคา</th>
-                        <th>รวม</th>
                         <th>การจัดการ</th>
                     </tr>
                 </thead>
@@ -37,7 +36,6 @@
                             ${{ item.product.price|floatformat:2 }}
                             {% endif %}
                         </td>
-                        <td>{{ item.subtotal|floatformat:2 }}</td>
                         <td>
                             <form action="{% url 'remove_from_cart' item.product.id %}" method="post"
                                 style="display:inline;">
