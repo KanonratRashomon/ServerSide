@@ -1,21 +1,21 @@
 from django.db import models
+from django.contrib.auth.models import User
+# class Customer(models.Model):
+#     first_name = models.CharField(max_length=150, null=False)
+#     last_name = models.CharField(max_length=200, null=False)
+#     email = models.CharField(max_length=150, null=False)
+#     address = models.JSONField(null=True)
 
-class Customer(models.Model):
-    first_name = models.CharField(max_length=150, null=False)
-    last_name = models.CharField(max_length=200, null=False)
-    email = models.CharField(max_length=150, null=False)
-    address = models.JSONField(null=True)
+#     def __str__(self):
+#         return self.username
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.username
-
-class Orders(models.Model):
-    order_date = models.DateTimeField(auto_now_add=True)
-    total_amount = models.FloatField()
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Order {self.id} by {self.customer.username}"
+        return f'Order {self.id} by {self.user.username}'
 
 class Products(models.Model):
     title = models.CharField(max_length=200)
@@ -46,16 +46,29 @@ class Employee(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Orders, on_delete=models.CASCADE) #อ้างอิงจาก Orders
-    product = models.ForeignKey(Products, on_delete=models.CASCADE) #อ้างอิงจาก Products
-    quantity = models.IntegerField()
-    unit_price = models.FloatField()
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.title} in Order {self.order.id}"
+        return f'{self.product.title} ({self.quantity})'
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class CartItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cart_items', null=True, blank=True)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+
+    def __str__(self):
+        return f'{self.product.title} - {self.quantity}'

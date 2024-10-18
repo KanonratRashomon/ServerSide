@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติการสั่งซื้อ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    {% include 'nav.html' %}
+    <div class='container-sm border my-3'>
+        <div class="col-md-12">
+            <h1>ประวัติการสั่งซื้อ</h1>
+            {% if orders %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>หมายเลขคำสั่งซื้อ</th>
+                        <th>วันที่สั่งซื้อ</th>
+                        <th>จำนวนรายการ</th>
+                        <th>ราคารวม</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>{{ order.items.count }}</td>
+                        <td>฿{{ order.total_price|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>คุณยังไม่มีประวัติการสั่งซื้อ</p>
+            {% endif %}
+            <div class='text-end mt-3 mb-3'>
+                <a href="{% url 'products' %}" class="btn btn-primary">กลับไปยังหน้าสินค้า</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

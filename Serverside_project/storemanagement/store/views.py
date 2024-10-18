@@ -160,125 +160,182 @@ class ChangePassword(View):
             return render(request, 'change_password.html', {'form': form})
 
 class AddToCartView(View):
-    login_url = '/login/'
-    permission_required = ["store.view_products"]
     def post(self, request, product_id):
         try:
             product = Products.objects.get(id=product_id)
         except Products.DoesNotExist:
-            messages.error(request, "สินค้าที่คุณพยายามเพิ่มไม่มีในระบบ.")
             return redirect('products')
 
-        cart = request.session.get('cart', {})
         quantity = int(request.POST.get('quantity', 1))
 
-        if str(product_id) in cart:
-            cart[str(product_id)] += quantity 
+        if request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
+                product=product,
+                defaults={'quantity': 0, 'user': request.user if request.user.is_authenticated else None}
+            )
+
+            cart_item.quantity += quantity
+            cart_item.save()
         else:
-            cart[str(product_id)] = quantity 
+            cart = request.session.get('cart', {})
+            if str(product_id) in cart:
+                cart[str(product_id)] += quantity
+            else:
+                cart[str(product_id)] = quantity
             
-        request.session['cart'] = cart
-        messages.success(request, f'เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว: {product.title} จำนวน {quantity} ชิ้น')
-        
-        return redirect('cart')  # Redirect to cart view
+            request.session['cart'] = cart
+        return redirect('cart')
+
 
 class CartView(View):
-    login_url = '/login/'
-    permission_required = ["store.view_products"]
     def get(self, request):
-        cart = request.session.get('cart', {})
-        cart_items = []
-        total = 0
+        if request.user.is_authenticated:
+            cart_items = CartItem.objects.filter(cart__user=request.user)
+            total = sum(item.product.price * item.quantity for item in cart_items)
+        else:
+            cart = request.session.get('cart', {})
+            cart_items = []
+            total = 0
 
-        for product_id, quantity in cart.items():
-            try:
+            for product_id, quantity in cart.items():
                 product = Products.objects.get(id=product_id)
-                subtotal = product.get_discounted_price() * quantity
+                subtotal = product.price * quantity
                 total += subtotal
                 cart_items.append({
                     'product': product,
                     'quantity': quantity,
                     'subtotal': subtotal
                 })
-            except Products.DoesNotExist:
-                messages.warning(request, f'Product ID {product_id} not found.')
 
         context = {
             'cart_items': cart_items,
             'total': total,
         }
+
         return render(request, 'cart.html', context)
 
     def post(self, request, product_id):
-        cart = request.session.get('cart', {})
+        try:
+            product = Products.objects.get(id=product_id)
+        except Products.DoesNotExist:
+            return redirect('cart')
+
         quantity = int(request.POST.get('quantity', 1))
-        if str(product_id) in cart:
-            cart[str(product_id)] += quantity 
-            messages.info(request, f'เพิ่มสินค้า ID {product_id} จำนวน {quantity} ชิ้นในตะกร้าแล้ว')
+
+        if request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
+                product=product,
+                defaults={'quantity': 0, 'user': request.user}
+            )
+            cart_item.quantity += quantity
+            cart_item.save()
         else:
-            cart[str(product_id)] = quantity
-            messages.success(request, f'เพิ่มสินค้า ID {product_id} ลงในตะกร้าแล้ว: {quantity} ชิ้น')
-
-        request.session['cart'] = cart
-        return redirect('cart')
-
-class RemoveFromCartView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    login_url = '/login/'
-    permission_required = ["store.view_products"]
-
-    def post(self, request, product_id):
-        print(f"Request to remove product ID: {product_id}")
-        cart = request.session.get('cart', {})
-        print(f"Current cart: {cart}")
-
-        if str(product_id) in cart:
-            if cart[str(product_id)] > 1:
-                cart[str(product_id)] -= 1
+            cart = request.session.get('cart', {})
+            if str(product_id) in cart:
+                cart[str(product_id)] += quantity
             else:
-                del cart[str(product_id)]
-        else:
-            print(f"Product ID {product_id} not in cart")
+                cart[str(product_id)] = quantity
+            request.session['cart'] = cart
 
-        request.session['cart'] = cart
         return redirect('cart')
 
-class CheckoutView(View):
-    login_url = '/login/'
-    permission_required = ["store.view_products"]
-    def post(self, request):
-        cart = request.session.get('cart', {})
-        total = 0
-
-        # คำนวณราคารวมจากตะกร้า
-        for product_id, quantity in cart.items():
+class RemoveFromCartView(View):
+    def post(self, request, product_id):
+        if request.user.is_authenticated:
             try:
-                product = Products.objects.get(id=product_id)
-                total += product.get_discounted_price() * quantity
-            except Products.DoesNotExist:
-                messages.error(request, f'สินค้า ID {product_id} ไม่พบ')
+                # Retrieve the cart associated with the authenticated user
+                cart = Cart.objects.get(user=request.user)
+                cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+
+                if cart_item.quantity > 1:
+                    cart_item.quantity -= 1
+                    cart_item.save()
+                else:
+                    cart_item.delete()
+
+            except Cart.DoesNotExist:
+                messages.error(request, "ไม่พบตะกร้าของคุณ.")
+                return redirect('cart')
+            except CartItem.DoesNotExist:
+                messages.error(request, "สินค้าที่คุณพยายามลบไม่มีในตะกร้า.")
                 return redirect('cart')
 
-        # แสดงข้อความสำเร็จ
-        messages.success(request, f'คุณมีสินค้าที่จะชำระเงินทั้งหมด: ฿{total}')
-        
-        # ลบสินค้าจากตะกร้า
-        request.session['cart'] = {}  # ลบสินค้าทั้งหมดออกจากตะกร้า หรือเปลี่ยนตามต้องการ
+        else:
+            # Handle cases for anonymous users (session-based cart)
+            cart = request.session.get('cart', {})
+            if str(product_id) in cart:
+                if cart[str(product_id)] > 1:
+                    cart[str(product_id)] -= 1
+                else:
+                    del cart[str(product_id)]
+            else:
+                messages.error(request, "สินค้าที่คุณพยายามลบไม่มีในตะกร้า.")
 
-        return redirect('products')  # เปลี่ยนเส้นทางไปยังหน้าสินค้า
+            request.session['cart'] = cart
 
+        messages.success(request, "ลบสินค้าจากตะกร้าเรียบร้อยแล้ว")
+        return redirect('cart')
+
+
+
+class CheckoutView(View):
     def get(self, request):
-        cart = request.session.get('cart', {})
-        total = 0
-        cart_items = []
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cart_items = cart.items.all()
+        except Cart.DoesNotExist:
+            cart_items = []
 
-        for product_id, quantity in cart.items():
-            try:
-                product = Products.objects.get(id=product_id)
-                subtotal = product.get_discounted_price() * quantity
-                total += subtotal
-                cart_items.append({'product': product, 'quantity': quantity, 'subtotal': subtotal})
-            except Products.DoesNotExist:
-                messages.error(request, f'สินค้า ID {product_id} ไม่พบ')
-                continue
+        total_price = sum(item.product.get_discounted_price() * item.quantity for item in cart_items)
 
-        return render(request, 'checkout.html', {'cart_items': cart_items, 'total': total})
+        context = {
+            'cart_items': cart_items,
+            'total_price': total_price,
+        }
+        return render(request, 'checkout.html', context)
+
+    def post(self, request):
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cart_items = cart.items.all()
+        except Cart.DoesNotExist:
+            messages.error(request, "ไม่พบสินค้าในตะกร้า")
+            return redirect('view_cart')
+
+        if not cart_items:
+            messages.error(request, "ตะกร้าของคุณว่างเปล่า")
+            return redirect('view_cart')
+
+        total_price = sum(item.product.get_discounted_price() * item.quantity for item in cart_items)
+
+        # สร้าง Order
+        order = Order.objects.create(user=request.user, total_price=total_price)
+
+        # ย้ายข้อมูลจาก CartItem ไปยัง OrderItem
+        for cart_item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=cart_item.product,
+                quantity=cart_item.quantity,
+                price=cart_item.product.get_discounted_price()
+            )
+
+        # ล้าง Cart
+        cart.items.all().delete()
+        cart.delete()
+
+        messages.success(request, "การสั่งซื้อของคุณเสร็จสมบูรณ์")
+        return redirect('order_history')
+
+class OrderHistoryView(View):
+    def get(self, request):
+        orders = Order.objects.filter(user=request.user).order_by('-created_at')
+        return render(request, 'order_history.html', {'orders': orders})
+
+

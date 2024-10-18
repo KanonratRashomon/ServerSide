@@ -20,8 +20,9 @@
                     <tr>
                         <th>ชื่อสินค้า</th>
                         <th>จำนวน</th>
-                        <th>ราคา</th>
-                        <th>รวม</th>
+                        <th>ราคาต่อชิ้น</th>
+                        <th>ส่วนลด</th>
+                        <th>ราคารวม</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,29 +30,25 @@
                     <tr>
                         <td>{{ item.product.title }}</td>
                         <td>{{ item.quantity }}</td>
-                        <td>
-                            {% if item.product.discount > 0 %}
-                            <s>${{ item.product.price|floatformat:2 }}</s> ${{item.product.get_discounted_price|floatformat:2 }}
-                            {% else %}
-                            ${{ item.product.price|floatformat:2 }}
-                            {% endif %}
-                        </td>
-                        <td>{{ item.subtotal|floatformat:2 }}</td>
+                        <td>฿{{ item.product.price|floatformat:2 }}</td>
+                        <td>{{ item.product.discount }}%</td>
+                        <td>฿{{ item.product.get_discounted_price|floatformat:2 }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <h3 class='text-end'>รวมทั้งหมด: ${{ total|floatformat:2 }}</h3>
-            <form action="{% url 'checkout' %}" method="post" class="text-end mt-3">
+            <h3 class='text-end'>รวมทั้งหมด: ฿{{ total_price|floatformat:2 }}</h3>
+            <form method="post" class="text-end mt-3 mb-3">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-success ">ยืนยันการชำระเงิน</button>
+                <button type="submit" class="btn btn-success">ยืนยันการชำระเงิน</button>
+                <a href="{% url 'cart' %}" class="btn btn-secondary">กลับไปยังตะกร้าสินค้า</a>
             </form>
             {% else %}
             <p>ตะกร้าของคุณว่างเปล่า</p>
-            {% endif %}
             <div class='text-end mt-3 mb-3'>
                 <a href="{% url 'cart' %}" class="btn btn-primary">กลับไปยังหน้าสินค้า</a>
             </div>
+            {% endif %}
         </div>
     </div>
 </body>
